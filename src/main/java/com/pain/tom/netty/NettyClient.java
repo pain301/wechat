@@ -1,8 +1,13 @@
 package com.pain.tom.netty;
 
 import com.pain.tom.handler.ClientHandler;
+import com.pain.tom.protocol.packet.MessageRequestPacket;
+import com.pain.tom.protocol.packet.PacketEncoder;
+import com.pain.tom.util.LoginUtil;
 import io.netty.bootstrap.Bootstrap;
+import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -14,6 +19,7 @@ import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
 
 import java.util.Date;
+import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 
 public class NettyClient {
@@ -59,6 +65,8 @@ public class NettyClient {
             public void operationComplete(Future<? super Void> future) throws Exception {
                 if (future.isSuccess()) {
                     System.out.println("客户端连接成功!");
+                    Channel channel = ((ChannelFuture) future).channel();
+                    startConsoleThread(channel);
                 } else {
                     System.out.println("客户端连接失败!");
 
@@ -74,5 +82,23 @@ public class NettyClient {
                 }
             }
         });
+    }
+
+    private static void startConsoleThread(Channel channel) {
+        new Thread(() -> {
+            while (!Thread.interrupted()) {
+                if (LoginUtil.hasLogin(channel)) {
+                    System.out.println("输入消息发送到客户端：");
+
+                    Scanner scanner = new Scanner(System.in);
+                    String line = scanner.nextLine();
+
+                    MessageRequestPacket packet = new MessageRequestPacket();
+                    packet.setMessage(line);
+                    ByteBuf buf = PacketEncoder.INSTANCE.encode(channel.alloc(), packet);
+                    channel.writeAndFlush(buf);
+                }
+            }
+        }).start();
     }
 }

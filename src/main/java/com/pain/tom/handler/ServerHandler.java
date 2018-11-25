@@ -1,9 +1,6 @@
 package com.pain.tom.handler;
 
-import com.pain.tom.protocol.packet.LoginRequestPacket;
-import com.pain.tom.protocol.packet.LoginResponsePacket;
-import com.pain.tom.protocol.packet.Packet;
-import com.pain.tom.protocol.packet.PacketEncoder;
+import com.pain.tom.protocol.packet.*;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
@@ -32,6 +29,15 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {
             }
 
             ByteBuf responseBuf = PacketEncoder.INSTANCE.encode(ctx.alloc(), loginResponsePacket);
+            ctx.channel().writeAndFlush(responseBuf);
+        } else if (packet instanceof MessageRequestPacket) {
+            System.out.println("服务端接收消息。。。");
+            MessageRequestPacket requestPacket = (MessageRequestPacket) packet;
+            System.out.println(new Date() + ": 收到客户端消息； " + requestPacket.getMessage());
+
+            MessageResponsePacket responsePacket = new MessageResponsePacket();
+            responsePacket.setMessage("服务端回复：【" + requestPacket.getMessage() + "】");
+            ByteBuf responseBuf = PacketEncoder.INSTANCE.encode(ctx.alloc(), responsePacket);
             ctx.channel().writeAndFlush(responseBuf);
         } else {
             System.out.println("Invalid request...");

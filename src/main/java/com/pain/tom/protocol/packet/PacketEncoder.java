@@ -20,6 +20,9 @@ public class PacketEncoder {
     static {
         PACKET_TYPE_MAP.put(Command.LOGIN_REQUEST, LoginRequestPacket.class);
         PACKET_TYPE_MAP.put(Command.LOGIN_RESPONSE, LoginResponsePacket.class);
+        PACKET_TYPE_MAP.put(Command.MESSAGE_REQUEST, MessageRequestPacket.class);
+        PACKET_TYPE_MAP.put(Command.MESSAGE_RESPONSE, MessageResponsePacket.class);
+
         SERIALIZER_MAP.put(SerializeAlgorithm.JSON, new JSONSerializer());
     }
 

@@ -1,9 +1,7 @@
 package com.pain.tom.handler;
 
-import com.pain.tom.protocol.packet.LoginRequestPacket;
-import com.pain.tom.protocol.packet.LoginResponsePacket;
-import com.pain.tom.protocol.packet.Packet;
-import com.pain.tom.protocol.packet.PacketEncoder;
+import com.pain.tom.protocol.packet.*;
+import com.pain.tom.util.LoginUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
@@ -37,10 +35,14 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
             LoginResponsePacket loginResponsePacket = (LoginResponsePacket) packet;
 
             if (loginResponsePacket.isSuccess()) {
+                LoginUtil.markAsLogin(ctx.channel());
                 System.out.println(new Date() + ": 客户端登录成功...");
             } else {
                 System.out.println(new Date() + ": 客户端登录失败，原因是：" + loginResponsePacket.getReason());
             }
+        } else if (packet instanceof MessageResponsePacket) {
+            MessageResponsePacket responsePacket = (MessageResponsePacket) packet;
+            System.out.println(new Date() + ": 收到服务端消息：" + responsePacket.getMessage());
         } else {
             System.out.println("Invalid request...");
         }
