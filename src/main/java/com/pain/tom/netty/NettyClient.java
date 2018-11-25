@@ -1,5 +1,6 @@
 package com.pain.tom.netty;
 
+import com.pain.tom.handler.ClientHandler;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
@@ -44,14 +45,15 @@ public class NettyClient {
                     protected void initChannel(SocketChannel channel) throws Exception {
                         // 添加逻辑处理器
 //                        channel.pipeline().addLast(new StringEncoder());
-                        channel.pipeline().addLast(new FirstClientHandler());
+//                        channel.pipeline().addLast(new FirstClientHandler());
+                        channel.pipeline().addLast(new ClientHandler());
                     }
                 });
 
         connect(bootstrap, "127.0.0.1", 8000, MAX_RETRY);
     }
 
-    private static void connect(Bootstrap bootstrap, String host, int port, int retryTimes) {
+    private static void connect(final Bootstrap bootstrap, String host, int port, final int retryTimes) {
         bootstrap.connect(host, port).addListener(new GenericFutureListener<Future<? super Void>>() {
             @Override
             public void operationComplete(Future<? super Void> future) throws Exception {

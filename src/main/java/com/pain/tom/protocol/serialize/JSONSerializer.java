@@ -6,7 +6,7 @@ public class JSONSerializer implements Serializer {
 
 
     public byte getSerializeAlgorithm() {
-        return 0;
+        return SerializeAlgorithm.JSON;
     }
 
     public byte[] serialize(Object o) {

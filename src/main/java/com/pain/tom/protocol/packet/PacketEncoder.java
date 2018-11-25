@@ -15,14 +15,20 @@ public class PacketEncoder {
 
     private static final Map<Byte, Class<? extends Packet>> PACKET_TYPE_MAP = new HashMap<Byte, Class<? extends Packet>>();
     private static final Map<Byte, Serializer> SERIALIZER_MAP = new HashMap<Byte, Serializer>();
+    public static final PacketEncoder INSTANCE = new PacketEncoder();
 
     static {
-        PACKET_TYPE_MAP.put(Command.LOGIN_REQUEST, LoginPacket.class);
+        PACKET_TYPE_MAP.put(Command.LOGIN_REQUEST, LoginRequestPacket.class);
+        PACKET_TYPE_MAP.put(Command.LOGIN_RESPONSE, LoginResponsePacket.class);
         SERIALIZER_MAP.put(SerializeAlgorithm.JSON, new JSONSerializer());
     }
 
     public ByteBuf encode(Packet packet) {
-        ByteBuf buf = ByteBufAllocator.DEFAULT.ioBuffer();
+        return encode(ByteBufAllocator.DEFAULT, packet);
+    }
+
+    public ByteBuf encode(ByteBufAllocator allocator, Packet packet) {
+        ByteBuf buf = allocator.ioBuffer();
         byte[] bytes = Serializer.DEFAULT.serialize(packet);
 
         buf.writeInt(MAGIC_NUMBER);
@@ -36,7 +42,10 @@ public class PacketEncoder {
     }
 
     public Packet decode(ByteBuf buf) {
+        // skip magic number
         buf.skipBytes(4);
+
+        // skip version
         buf.skipBytes(1);
 
         byte serializeAlgorithm = buf.readByte();

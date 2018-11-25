@@ -1,8 +1,8 @@
 package com.pain.tom.protocol.packet;
 
-public class LoginPacket extends Packet {
+public class LoginRequestPacket extends Packet {
 
-    private Integer userId;
+    private String userId;
 
     private String username;
 
@@ -10,14 +10,14 @@ public class LoginPacket extends Packet {
 
     @Override
     public Byte getCommand() {
-        return null;
+        return Command.LOGIN_REQUEST;
     }
 
-    public Integer getUserId() {
+    public String getUserId() {
         return userId;
     }
 
-    public void setUserId(Integer userId) {
+    public void setUserId(String userId) {
         this.userId = userId;
     }
 

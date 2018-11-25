@@ -1,5 +1,6 @@
 package com.pain.tom.netty;
 
+import com.pain.tom.handler.ServerHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInitializer;
@@ -56,7 +57,8 @@ public class NettyServer {
 
                     @Override
                     protected void initChannel(NioSocketChannel channel) throws Exception {
-                        channel.pipeline().addLast(new FirstServerHandler());
+//                        channel.pipeline().addLast(new FirstServerHandler());
+                        channel.pipeline().addLast(new ServerHandler());
 //                        channel.pipeline().addLast(new StringDecoder());
 //                        channel.pipeline().addLast(new SimpleChannelInboundHandler<String>() {
 //                            @Override
@@ -68,11 +70,15 @@ public class NettyServer {
                 });
 
         bind(serverBootstrap, 8000);
+
+        // TOOO add finally block
+//        boss.shutdownGracefully();
+//        worker.shutdownGracefully();
     }
 
-    private static void bind(ServerBootstrap serverBootstrap, int port) {
+    private static void bind(final ServerBootstrap serverBootstrap, final int port) {
         serverBootstrap.bind(port).addListener(new GenericFutureListener<Future<? super Void>>() {
-            @Override
+
             public void operationComplete(Future<? super Void> future) throws Exception {
                 if (future.isSuccess()) {
                     System.out.println(String.format("服务器绑定端口 %d 成功!", port));
