@@ -5,6 +5,7 @@ import com.pain.tom.protocol.serialize.SerializeAlgorithm;
 import com.pain.tom.protocol.serialize.Serializer;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
+import io.netty.buffer.Unpooled;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -77,6 +78,14 @@ public class PacketCodeConverter {
         }
 
         return null;
+    }
+
+    public static void main(String[] args) {
+        MessageRequestPacket packet = new MessageRequestPacket("hello world");
+        ByteBuf buf = Unpooled.buffer();
+        PacketCodeConverter.INSTANCE.encode(packet, buf);
+        packet = (MessageRequestPacket) PacketCodeConverter.INSTANCE.decode(buf);
+        System.out.println(packet);
     }
 
     private Class<? extends Packet> getPacketType(byte command) {

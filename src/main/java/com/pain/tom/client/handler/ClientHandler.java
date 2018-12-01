@@ -21,6 +21,7 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
         packet.setUsername("pain");
         packet.setPassword("123456");
 
+        // TODO
         ByteBuf buf = PacketCodeConverter.INSTANCE.encode(ctx.alloc(), packet);
         ctx.channel().writeAndFlush(buf);
     }

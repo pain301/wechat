@@ -25,6 +25,8 @@ import java.util.concurrent.TimeUnit;
 public class NettyClient {
 
     private static final int MAX_RETRY = 5;
+    private static final String HOST = "127.0.0.1";
+    private static final int PORT = 8000;
 
     public static void main(String[] args) {
         Bootstrap bootstrap = new Bootstrap();
@@ -61,29 +63,26 @@ public class NettyClient {
                     }
                 });
 
-        connect(bootstrap, "127.0.0.1", 8000, MAX_RETRY);
+        connect(bootstrap, HOST, PORT, MAX_RETRY);
     }
 
     private static void connect(final Bootstrap bootstrap, String host, int port, final int retryTimes) {
-        bootstrap.connect(host, port).addListener(new GenericFutureListener<Future<? super Void>>() {
-            @Override
-            public void operationComplete(Future<? super Void> future) throws Exception {
-                if (future.isSuccess()) {
-                    System.out.println("客户端连接成功!");
-                    Channel channel = ((ChannelFuture) future).channel();
-                    startConsoleThread(channel);
-                } else {
-                    System.out.println("客户端连接失败!");
+        bootstrap.connect(host, port).addListener(future ->  {
+            if (future.isSuccess()) {
+                System.out.println("客户端连接成功!");
+                Channel channel = ((ChannelFuture) future).channel();
+                startConsoleThread(channel);
+            } else {
+                System.out.println("客户端连接失败!");
 
-                    if (retryTimes == 0) {
-                        throw new RuntimeException("Out of retry times!");
-                    } else {
-                        int delay = 1 << (MAX_RETRY - retryTimes + 1);
-                        bootstrap
-                                .config()
-                                .group()
-                                .schedule(() -> connect(bootstrap, host, port, retryTimes - 1), delay, TimeUnit.SECONDS);
-                    }
+                if (retryTimes == 0) {
+                    throw new RuntimeException("Out of retry times!");
+                } else {
+                    int delay = 1 << (MAX_RETRY - retryTimes + 1);
+                    bootstrap
+                            .config()
+                            .group()
+                            .schedule(() -> connect(bootstrap, host, port, retryTimes - 1), delay, TimeUnit.SECONDS);
                 }
             }
         });
@@ -93,14 +92,13 @@ public class NettyClient {
         new Thread(() -> {
             while (!Thread.interrupted()) {
                 if (LoginUtil.hasLogin(channel)) {
-                    System.out.println("输入消息发送到客户端：");
+                    System.out.println("输入消息发送到服务器：");
 
                     Scanner scanner = new Scanner(System.in);
                     String line = scanner.nextLine();
 
-                    for (int i = 0; i < 10; ++i) {
-                        MessageRequestPacket packet = new MessageRequestPacket();
-                        packet.setMessage(line);
+                    for (int i = 0; i < 16; ++i) {
+                        MessageRequestPacket packet = new MessageRequestPacket(line);
                         channel.writeAndFlush(packet);
                     }
                 }

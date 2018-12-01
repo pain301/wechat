@@ -14,6 +14,8 @@ import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
 
 public class NettyServer {
+    private static final int PORT = 8000;
+
     public static void main(String[] args) {
         ServerBootstrap serverBootstrap = new ServerBootstrap();
 
@@ -74,24 +76,21 @@ public class NettyServer {
                     }
                 });
 
-        bind(serverBootstrap, 8000);
+        bind(serverBootstrap, PORT);
 
-        // TOOO add finally block
+        // TODO add finally block
 //        boss.shutdownGracefully();
 //        worker.shutdownGracefully();
     }
 
     private static void bind(final ServerBootstrap serverBootstrap, final int port) {
-        serverBootstrap.bind(port).addListener(new GenericFutureListener<Future<? super Void>>() {
-
-            public void operationComplete(Future<? super Void> future) throws Exception {
-                if (future.isSuccess()) {
-                    System.out.println(String.format("服务器绑定端口 %d 成功!", port));
-                } else {
-                    System.out.println(String.format("服务器绑定端口 %d 失败!", port));
-                    Thread.sleep(500);
-                    bind(serverBootstrap, port + 1);
-                }
+        serverBootstrap.bind(port).addListener( future -> {
+            if (future.isSuccess()) {
+                System.out.println(String.format("服务器绑定端口 %d 成功!", port));
+            } else {
+                System.out.println(String.format("服务器绑定端口 %d 失败!", port));
+                Thread.sleep(500);
+                bind(serverBootstrap, port + 1);
             }
         });
     }

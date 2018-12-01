@@ -4,6 +4,15 @@ public class MessageRequestPacket extends Packet {
 
     private String message;
 
+    MessageRequestPacket() {
+        super();
+    }
+
+    public MessageRequestPacket(String message) {
+        super();
+        this.message = message;
+    }
+
     @Override
     public Byte getCommand() {
         return Command.MESSAGE_REQUEST;
