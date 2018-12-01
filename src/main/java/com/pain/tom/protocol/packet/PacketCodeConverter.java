@@ -9,13 +9,13 @@ import io.netty.buffer.ByteBufAllocator;
 import java.util.HashMap;
 import java.util.Map;
 
-public class PacketEncoder {
+public class PacketCodeConverter {
 
-    private static final int MAGIC_NUMBER = 0x12345678;
+    public static final int MAGIC_NUMBER = 0x12345678;
 
     private static final Map<Byte, Class<? extends Packet>> PACKET_TYPE_MAP = new HashMap<Byte, Class<? extends Packet>>();
     private static final Map<Byte, Serializer> SERIALIZER_MAP = new HashMap<Byte, Serializer>();
-    public static final PacketEncoder INSTANCE = new PacketEncoder();
+    public static final PacketCodeConverter INSTANCE = new PacketCodeConverter();
 
     static {
         PACKET_TYPE_MAP.put(Command.LOGIN_REQUEST, LoginRequestPacket.class);
@@ -42,6 +42,17 @@ public class PacketEncoder {
         buf.writeBytes(bytes);
 
         return buf;
+    }
+
+    public void encode(Packet packet, ByteBuf buf) {
+        byte[] bytes = Serializer.DEFAULT.serialize(packet);
+
+        buf.writeInt(MAGIC_NUMBER);
+        buf.writeByte(packet.getVersion());
+        buf.writeByte(Serializer.DEFAULT.getSerializeAlgorithm());
+        buf.writeByte(packet.getCommand());
+        buf.writeInt(bytes.length);
+        buf.writeBytes(bytes);
     }
 
     public Packet decode(ByteBuf buf) {

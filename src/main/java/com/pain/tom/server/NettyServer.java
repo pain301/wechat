@@ -1,15 +1,14 @@
-package com.pain.tom.netty;
+package com.pain.tom.server;
 
-import com.pain.tom.handler.ServerHandler;
+import com.pain.tom.handler.*;
+import com.pain.tom.server.handler.LoginRequestHandler;
+import com.pain.tom.server.handler.MessageRequestHandler;
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
-import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.handler.codec.string.StringDecoder;
 import io.netty.util.AttributeKey;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
@@ -58,7 +57,13 @@ public class NettyServer {
                     @Override
                     protected void initChannel(NioSocketChannel channel) throws Exception {
 //                        channel.pipeline().addLast(new FirstServerHandler());
-                        channel.pipeline().addLast(new ServerHandler());
+//                        channel.pipeline().addLast(new ServerHandler());
+                        channel.pipeline().addLast(new Spliter());
+                        channel.pipeline().addLast(new PacketDecoder());
+                        channel.pipeline().addLast(new LoginRequestHandler());
+                        channel.pipeline().addLast(new MessageRequestHandler());
+                        channel.pipeline().addLast(new PacketEncoder());
+
 //                        channel.pipeline().addLast(new StringDecoder());
 //                        channel.pipeline().addLast(new SimpleChannelInboundHandler<String>() {
 //                            @Override

@@ -1,4 +1,4 @@
-package com.pain.tom.netty;
+package com.pain.tom.server.handler;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;

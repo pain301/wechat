@@ -1,4 +1,4 @@
-package com.pain.tom.handler;
+package com.pain.tom.client.handler;
 
 import com.pain.tom.protocol.packet.*;
 import com.pain.tom.util.LoginUtil;
@@ -21,7 +21,7 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
         packet.setUsername("pain");
         packet.setPassword("123456");
 
-        ByteBuf buf = PacketEncoder.INSTANCE.encode(ctx.alloc(), packet);
+        ByteBuf buf = PacketCodeConverter.INSTANCE.encode(ctx.alloc(), packet);
         ctx.channel().writeAndFlush(buf);
     }
 
@@ -29,7 +29,7 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         ByteBuf buf = (ByteBuf) msg;
 
-        Packet packet = PacketEncoder.INSTANCE.decode(buf);
+        Packet packet = PacketCodeConverter.INSTANCE.decode(buf);
 
         if (packet instanceof LoginResponsePacket) {
             LoginResponsePacket loginResponsePacket = (LoginResponsePacket) packet;

@@ -1,8 +1,10 @@
-package com.pain.tom.netty;
+package com.pain.tom.client;
 
-import com.pain.tom.handler.ClientHandler;
+import com.pain.tom.client.handler.LoginResponseHandler;
+import com.pain.tom.client.handler.MessageResponseHandler;
+import com.pain.tom.handler.*;
 import com.pain.tom.protocol.packet.MessageRequestPacket;
-import com.pain.tom.protocol.packet.PacketEncoder;
+import com.pain.tom.protocol.packet.PacketCodeConverter;
 import com.pain.tom.util.LoginUtil;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
@@ -13,12 +15,10 @@ import io.netty.channel.ChannelOption;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.handler.codec.string.StringEncoder;
 import io.netty.util.AttributeKey;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
 
-import java.util.Date;
 import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 
@@ -52,7 +52,12 @@ public class NettyClient {
                         // 添加逻辑处理器
 //                        channel.pipeline().addLast(new StringEncoder());
 //                        channel.pipeline().addLast(new FirstClientHandler());
-                        channel.pipeline().addLast(new ClientHandler());
+//                        channel.pipeline().addLast(new ClientHandler());
+                        channel.pipeline().addLast(new Spliter());
+                        channel.pipeline().addLast(new PacketDecoder());
+                        channel.pipeline().addLast(new LoginResponseHandler());
+                        channel.pipeline().addLast(new MessageResponseHandler());
+                        channel.pipeline().addLast(new PacketEncoder());
                     }
                 });
 
@@ -93,10 +98,11 @@ public class NettyClient {
                     Scanner scanner = new Scanner(System.in);
                     String line = scanner.nextLine();
 
-                    MessageRequestPacket packet = new MessageRequestPacket();
-                    packet.setMessage(line);
-                    ByteBuf buf = PacketEncoder.INSTANCE.encode(channel.alloc(), packet);
-                    channel.writeAndFlush(buf);
+                    for (int i = 0; i < 10; ++i) {
+                        MessageRequestPacket packet = new MessageRequestPacket();
+                        packet.setMessage(line);
+                        channel.writeAndFlush(packet);
+                    }
                 }
             }
         }).start();

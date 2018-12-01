@@ -1,4 +1,4 @@
-package com.pain.tom.handler;
+package com.pain.tom.server.handler;
 
 import com.pain.tom.protocol.packet.*;
 import io.netty.buffer.ByteBuf;
@@ -13,7 +13,7 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {
         System.out.println(new Date() + ": 客户端开始登录。。。");
         ByteBuf buf = (ByteBuf) msg;
 
-        Packet packet = PacketEncoder.INSTANCE.decode(buf);
+        Packet packet = PacketCodeConverter.INSTANCE.decode(buf);
 
         if (packet instanceof LoginRequestPacket) {
             System.out.println("Valid request...");
@@ -28,7 +28,7 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {
                 loginResponsePacket.setSuccess(false);
             }
 
-            ByteBuf responseBuf = PacketEncoder.INSTANCE.encode(ctx.alloc(), loginResponsePacket);
+            ByteBuf responseBuf = PacketCodeConverter.INSTANCE.encode(ctx.alloc(), loginResponsePacket);
             ctx.channel().writeAndFlush(responseBuf);
         } else if (packet instanceof MessageRequestPacket) {
             System.out.println("服务端接收消息。。。");
@@ -37,7 +37,7 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {
 
             MessageResponsePacket responsePacket = new MessageResponsePacket();
             responsePacket.setMessage("服务端回复：【" + requestPacket.getMessage() + "】");
-            ByteBuf responseBuf = PacketEncoder.INSTANCE.encode(ctx.alloc(), responsePacket);
+            ByteBuf responseBuf = PacketCodeConverter.INSTANCE.encode(ctx.alloc(), responsePacket);
             ctx.channel().writeAndFlush(responseBuf);
         } else {
             System.out.println("Invalid request...");
