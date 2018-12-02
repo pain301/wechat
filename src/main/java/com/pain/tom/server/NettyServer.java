@@ -1,6 +1,7 @@
 package com.pain.tom.server;
 
 import com.pain.tom.handler.*;
+import com.pain.tom.server.handler.LifeCycleHandler;
 import com.pain.tom.server.handler.LoginRequestHandler;
 import com.pain.tom.server.handler.MessageRequestHandler;
 import io.netty.bootstrap.ServerBootstrap;
@@ -60,6 +61,7 @@ public class NettyServer {
                     protected void initChannel(NioSocketChannel channel) throws Exception {
 //                        channel.pipeline().addLast(new FirstServerHandler());
 //                        channel.pipeline().addLast(new ServerHandler());
+                        channel.pipeline().addLast(new LifeCycleHandler());
                         channel.pipeline().addLast(new Spliter());
                         channel.pipeline().addLast(new PacketDecoder());
                         channel.pipeline().addLast(new LoginRequestHandler());

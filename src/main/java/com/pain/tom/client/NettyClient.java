@@ -97,7 +97,7 @@ public class NettyClient {
                     Scanner scanner = new Scanner(System.in);
                     String line = scanner.nextLine();
 
-                    for (int i = 0; i < 16; ++i) {
+                    for (int i = 0; i < 1000; ++i) {
                         MessageRequestPacket packet = new MessageRequestPacket(line);
                         channel.writeAndFlush(packet);
                     }
